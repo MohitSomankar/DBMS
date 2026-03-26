@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Indian Police Management System | FIR & Criminal Records</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background: #0a0c12;
+            color: #eef2ff;
+        }
+
+        /* DARK THEME - NAVY + BLACK */
+        :root {
+            --bg-primary: #0b0e17;
+            --bg-secondary: #10131f;
+            --navy-dark: #0f172a;
+            --navy-medium: #1e293b;
+            --accent-blue: #2c6e9e;
+            --accent-gold: #d4af37;
+            --border-dim: #2d3748;
+            --card-bg: #111827;
+            --danger: #dc2626;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --info: #3b82f6;
+            --indian-saffron: #ff9933;
+            --indian-green: #138808;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+        }
+
+        /* App Layout */
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px 24px 40px;
+        }
+
+        /* HEADER */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 28px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-dim);
+        }
+        .title-section h1 {
+            font-size: 1.9rem;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #ff9933, #ffffff, #138808);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            display: inline-block;
+        }
+        .title-section p {
+            font-size: 0.85rem;
+            color: #7e8a9b;
+            margin-top: 4px;
+        }
+        .status-indicator {
+            background: #0f212e;
+            padding: 8px 18px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid var(--border-dim);
+        }
+        .led {
+            width: 12px;
+            height: 12px;
+            background-color: #2ecc71;
+            border-radius: 50%;
+            box-shadow: 0 0 5px #2ecc71;
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+        .status-text {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+
+        /* TABS (Navigation) */
+        .nav-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 30px;
+            background: var(--bg-secondary);
+            padding: 8px 12px;
+            border-radius: 60px;
+            border: 1px solid var(--border-dim);
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: #b9c3d4;
+            font-weight: 600;
+            padding: 10px 22px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 0.9rem;
+        }
+        .tab-btn.active {
+            background: var(--navy-medium);
+            color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        .tab-btn:hover:not(.active) {
+            background: #1e2a3a;
+            color: #e0e7ff;
+        }
+
+        /* Dashboard Cards */
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 20px;
+            margin-bottom: 32px;
+        }
+        .stat-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 20px 16px;
+            border-left: 5px solid var(--accent-blue);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            transition: 0.2s;
+        }
+        .stat-card h3 {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #9ca3af;
+            margin-bottom: 12px;
+        }
+        .stat-number {
+            font-size: 2.6rem;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+
+        /* Tables & Section Container */
+        .section-container {
+            background: var(--bg-secondary);
+            border-radius: 28px;
+            padding: 20px 20px 28px;
+            border: 1px solid var(--border-dim);
+            margin-top: 12px;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .search-box {
+            display: flex;
+            gap: 8px;
+            background: #1a1f2e;
+            padding: 6px 12px;
+            border-radius: 40px;
+            align-items: center;
+        }
+        .search-box input {
+            background: transparent;
+            border: none;
+            padding: 8px 12px;
+            color: white;
+            outline: none;
+            width: 200px;
+        }
+        .btn-add {
+            background: var(--accent-blue);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 32px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-add:hover {
+            background: #1e5a7d;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            overflow-x: auto;
+            display: block;
+        }
+        th, td {
+            text-align: left;
+            padding: 14px 8px;
+            border-bottom: 1px solid var(--border-dim);
+        }
+        th {
+            color: #b9c3d4;
+            font-weight: 600;
+        }
+        .badge {
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        .badge.active { background: #14532d; color: #86efac; }
+        .badge.closed { background: #4c1d1d; color: #f87171; }
+        .badge.open { background: #1e3a5f; color: #7ab7ef; }
+        .badge.arrested { background: #4b2e2e; color: #f9acac; }
+        button.action-btn {
+            background: none;
+            border: none;
+            margin: 0 5px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: 0.1s;
+        }
+        .edit-btn { color: #60a5fa; }
+        .delete-btn { color: #f87171; }
+        
+        /* Modal Overlay */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(4px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: 0.2s;
+        }
+        .modal-overlay.active {
+            visibility: visible;
+            opacity: 1;
+        }
+        .modal {
+            background: var(--bg-secondary);
+            width: 90%;
+            max-width: 500px;
+            border-radius: 32px;
+            padding: 24px;
+            border: 1px solid var(--border-dim);
+        }
+        .modal h2 {
+            margin-bottom: 20px;
+            color: #ff9933;
+        }
+        .modal input, .modal select {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0 16px;
+            background: #1e1f2c;
+            border: 1px solid var(--border-dim);
+            border-radius: 20px;
+            color: white;
+            outline: none;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 16px;
+        }
+        .modal-buttons button {
+            padding: 8px 20px;
+            border-radius: 30px;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-save {
+            background: var(--success);
+            color: white;
+        }
+        .btn-cancel {
+            background: #2d3748;
+            color: white;
+        }
+        .error-msg {
+            color: #f87171;
+            font-size: 0.75rem;
+            margin-top: -10px;
+            margin-bottom: 12px;
+        }
+
+        /* Indian Flag Tricolor Accent */
+        .indian-accent {
+            height: 3px;
+            background: linear-gradient(90deg, #ff9933, #ffffff, #138808);
+            width: 100%;
+            margin-top: 8px;
+        }
+
+        @media (max-width: 700px) {
+            .app-container { padding: 12px; }
+            .nav-tabs { border-radius: 20px; overflow-x: auto; flex-wrap: nowrap; }
+            .tab-btn { white-space: nowrap; }
+            th, td { font-size: 0.8rem; }
+        }
+        .footer {
+    margin-top: 40px;
+    padding: 20px;
+    text-align: center;
+    background: var(--bg-secondary);
+    border-top: 1px solid var(--border-dim);
+    border-radius: 20px;
+    color: #9ca3af;
+    font-size: 0.85rem;
+}
+    </style>
+</head>
+<body>
+<div class="app-container">
+    <div class="header">
+        <div class="title-section">
+            <h1>INDIAN POLICE</h1>
+            <p>Police Station Management System | FIR & Criminal Records | सत्यमेव जयते</p>
+            <div class="indian-accent"></div>
+        </div>
+        <div class="status-indicator">
+            <div class="led"></div>
+            <span class="status-text">System Online | सुरक्षा सेवा</span>
+        </div>
+    </div>
+
+    <div class="nav-tabs">
+        <button class="tab-btn active" data-tab="dashboard">📊 Dashboard</button>
+        <button class="tab-btn" data-tab="officers">👮 Police Officers</button>
+        <button class="tab-btn" data-tab="cases">⚖️ Cases / FIR</button>
+        <button class="tab-btn" data-tab="criminals">🔍 Criminals</button>
+        <button class="tab-btn" data-tab="arrests">⛓️ Arrests</button>
+        <button class="tab-btn" data-tab="schema">🗄️ DB Schema</button>
+    </div>
+
+    <!-- Dashboard Section -->
+    <div id="dashboard-section" class="tab-content active-section">
+        <div class="dashboard-stats" id="stats-container"></div>
+        <div class="section-container">
+            <h3 style="margin-bottom: 14px;">📌 Recent Activity Snapshot</h3>
+            <p style="color:#8d9aaf">Manage criminal records, FIRs, and police officers. All data stored locally.</p>
+            <p style="color:#ff9933; margin-top: 10px;">🇮🇳 Service to the Nation | जन सेवा ही सर्वोपरि</p>
+        </div>
+    </div>
+
+    <!-- Officers Section -->
+    <div id="officers-section" class="tab-content" style="display: none;">
+        <div class="section-container">
+            <div class="section-header">
+                <h2>👮 Police Officers (पुलिस अधिकारी)</h2>
+                <div style="display: flex; gap: 10px;">
+                    <div class="search-box"><input type="text" id="searchOfficers" placeholder="Search name/rank...">🔍</div>
+                    <button class="btn-add" id="addOfficerBtn">+ New Officer</button>
+                </div>
+            </div>
+            <div style="overflow-x: auto;">
+                <table id="officers-table">
+                    <thead><tr><th>ID</th><th>Full Name</th><th>Rank</th><th>Badge</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody id="officers-tbody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cases / FIR -->
+    <div id="cases-section" class="tab-content" style="display: none;">
+        <div class="section-container">
+            <div class="section-header">
+                <h2>📁 FIR / Cases (प्राथमिकी)</h2>
+                <div style="display: flex; gap: 10px;"><div class="search-box"><input type="text" id="searchCases" placeholder="Case ID / title...">🔍</div>
+                <button class="btn-add" id="addCaseBtn">+ New FIR</button></div>
+            </div>
+            <div style="overflow-x: auto;">
+                <table><thead><tr><th>FIR ID</th><th>Title</th><th>Description</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+                <tbody id="cases-tbody"></tbody></table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Criminals -->
+    <div id="criminals-section" class="tab-content" style="display: none;">
+        <div class="section-container">
+            <div class="section-header">
+                <h2>🚨 Criminal Records (अपराधी रिकॉर्ड)</h2>
+                <div style="display: flex; gap: 10px;"><div class="search-box"><input type="text" id="searchCriminals" placeholder="Name / crime...">🔍</div>
+                <button class="btn-add" id="addCriminalBtn">+ Add Criminal</button></div>
+            </div>
+            <div style="overflow-x: auto;"><table><thead><tr><th>ID</th><th>Full Name</th><th>Crime Type</th><th>Status</th><th>Risk Level</th><th>Actions</th></tr></thead>
+            <tbody id="criminals-tbody"></tbody></table></div>
+        </div>
+    </div>
+
+    <!-- Arrests -->
+    <div id="arrests-section" class="tab-content" style="display: none;">
+        <div class="section-container">
+            <div class="section-header">
+                <h2>⛓️ Arrest Records (गिरफ्तारी रिकॉर्ड)</h2>
+                <div style="display: flex; gap: 10px;"><div class="search-box"><input type="text" id="searchArrests" placeholder="Arrest ID / criminal...">🔍</div>
+                <button class="btn-add" id="addArrestBtn">+ New Arrest</button></div>
+            </div>
+            <div style="overflow-x: auto;"><table><thead><tr><th>Arrest ID</th><th>Criminal Name</th><th>Case FIR</th><th>Arrest Date</th><th>Location</th><th>Actions</th></tr></thead>
+            <tbody id="arrests-tbody"></tbody></table></div>
+        </div>
+    </div>
+
+    <!-- DB Schema Preview -->
+    <div id="schema-section" class="tab-content" style="display: none;">
+        <div class="section-container">
+            <h2>🗄️ Database Schema (localStorage)</h2>
+            <p style="margin-bottom: 12px;">Collections: officers, cases, criminals, arrests. Auto IDs and relationships.</p>
+            <pre style="background:#0a0c14; padding: 16px; border-radius: 20px; overflow-x: auto; color:#cbd5e6;">// Data Models (Indian Police System)
+Officers: { id, name, rank, badgeNumber, status }
+Cases/FIR: { id, title, description, status, date }
+Criminals: { id, name, crimeType, status, riskLevel }
+Arrests: { id, criminalId, criminalName, caseId, arrestDate, location }</pre>
+            <button id="resetDataBtn" style="margin-top: 20px; background:#4b2e2e; border:none; padding:8px 18px; border-radius:30px; color:white; cursor:pointer;">⟳ Reset to Sample Data</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL COMPONENT (Universal) -->
+<div id="globalModal" class="modal-overlay">
+    <div class="modal">
+        <h2 id="modalTitle">Add Record</h2>
+        <div id="modalFields"></div>
+        <div class="modal-buttons">
+            <button class="btn-cancel" id="modalCancel">Cancel</button>
+            <button class="btn-save" id="modalSave">Save</button>
+        </div>
+    </div>
+</div>
+
+<footer class="footer">
+    <p>© 2026 Mohit Somankar | Police Station Management System</p>
+    <p>Jai Hind</p>
+</footer>
+
+<script>
+    // ---------- DATA KEYS ----------
+    const STORAGE_KEYS = {
+        officers: 'indian_police_officers',
+        cases: 'indian_police_cases',
+        criminals: 'indian_police_criminals',
+        arrests: 'indian_police_arrests'
+    };
+
+    // ---------- SAMPLE PRELOAD WITH INDIAN NAMES ----------
+    function loadSampleData() {
+        if(!localStorage.getItem(STORAGE_KEYS.officers)) {
+            localStorage.setItem(STORAGE_KEYS.officers, JSON.stringify([
+                { id: "IPS001", name: "Amit Singh Rathore", rank: "Inspector General", badgeNumber: "IND1234", status: "Active" },
+                { id: "IPS002", name: "Priya Sharma", rank: "Superintendent", badgeNumber: "IND5678", status: "Active" },
+                { id: "IPS003", name: "Rajesh Kumar Verma", rank: "Sub-Inspector", badgeNumber: "IND9101", status: "Active" },
+                { id: "IPS004", name: "Meera Nair", rank: "Constable", badgeNumber: "IND1122", status: "On Leave" }
+            ]));
+        }
+        if(!localStorage.getItem(STORAGE_KEYS.cases)) {
+            localStorage.setItem(STORAGE_KEYS.cases, JSON.stringify([
+                { id: "FIR001", title: "Armed Robbery at Mumbai Central", description: "Jewelry store loot", status: "Open", date: "2025-02-10" },
+                { id: "FIR002", title: "Hit and Run - Delhi NCR", description: "Vehicle collision, victim critical", status: "Under Investigation", date: "2025-01-22" },
+                { id: "FIR003", title: "Cyber Fraud - Phishing Scam", description: "Online banking fraud", status: "Open", date: "2025-02-28" },
+                { id: "FIR004", title: "Property Dispute", description: "Land encroachment case", status: "Closed", date: "2025-01-15" }
+            ]));
+        }
+        if(!localStorage.getItem(STORAGE_KEYS.criminals)) {
+            localStorage.setItem(STORAGE_KEYS.criminals, JSON.stringify([
+                { id: "CRIM001", name: "Vikram Jadhav", crimeType: "Robbery", status: "Incarcerated", riskLevel: "High" },
+                { id: "CRIM002", name: "Neha Gupta", crimeType: "Cyber Fraud", status: "Wanted", riskLevel: "Medium" },
+                { id: "CRIM003", name: "Suresh Reddy", crimeType: "Assault", status: "Incarcerated", riskLevel: "High" },
+                { id: "CRIM004", name: "Arjun Thakur", crimeType: "Drug Trafficking", status: "Wanted", riskLevel: "Critical" }
+            ]));
+        }
+        if(!localStorage.getItem(STORAGE_KEYS.arrests)) {
+            localStorage.setItem(STORAGE_KEYS.arrests, JSON.stringify([
+                { id: "ARR001", criminalId: "CRIM001", criminalName: "Vikram Jadhav", caseId: "FIR001", arrestDate: "2025-02-15", location: "Mumbai Central" },
+                { id: "ARR002", criminalId: "CRIM003", criminalName: "Suresh Reddy", caseId: "FIR002", arrestDate: "2025-01-28", location: "Delhi" }
+            ]));
+        }
+    }
+    loadSampleData();
+
+    // Helper to get data
+    function getData(key) { return JSON.parse(localStorage.getItem(key)) || []; }
+    function saveData(key, data) { localStorage.setItem(key, JSON.stringify(data)); }
+
+    // Auto ID generation helpers
+    function genOfficerId() { let arr = getData(STORAGE_KEYS.officers); let max = 0; arr.forEach(o => { let num = parseInt(o.id.replace('IPS','')); if(num>max) max=num; }); return `IPS${String(max+1).padStart(3,'0')}`; }
+    function genCaseId() { let arr = getData(STORAGE_KEYS.cases); let max = 0; arr.forEach(c=>{ let num = parseInt(c.id.replace('FIR','')); if(num>max) max=num; }); return `FIR${String(max+1).padStart(3,'0')}`; }
+    function genCriminalId() { let arr = getData(STORAGE_KEYS.criminals); let max = 0; arr.forEach(c=>{ let num = parseInt(c.id.replace('CRIM','')); if(num>max) max=num; }); return `CRIM${String(max+1).padStart(3,'0')}`; }
+    function genArrestId() { let arr = getData(STORAGE_KEYS.arrests); let max = 0; arr.forEach(a=>{ let num = parseInt(a.id.replace('ARR','')); if(num>max) max=num; }); return `ARR${String(max+1).padStart(3,'0')}`; }
+
+    // Render Dashboard stats
+    function renderDashboard() {
+        const officers = getData(STORAGE_KEYS.officers);
+        const cases = getData(STORAGE_KEYS.cases);
+        const criminals = getData(STORAGE_KEYS.criminals);
+        const arrests = getData(STORAGE_KEYS.arrests);
+        const openCases = cases.filter(c => c.status !== "Closed").length;
+        document.getElementById('stats-container').innerHTML = `
+            <div class="stat-card"><h3>👮 Total Officers</h3><div class="stat-number">${officers.length}</div></div>
+            <div class="stat-card"><h3>⚖️ Total FIRs</h3><div class="stat-number">${cases.length}</div></div>
+            <div class="stat-card"><h3>🔍 Criminals</h3><div class="stat-number">${criminals.length}</div></div>
+            <div class="stat-card"><h3>⛓️ Arrests</h3><div class="stat-number">${arrests.length}</div></div>
+            <div class="stat-card"><h3>📂 Active Cases</h3><div class="stat-number">${openCases}</div></div>
+        `;
+    }
+
+    // Rendering tables with search + delete/edit actions
+    let currentEditContext = null;
+    let activeModalSection = '';
+
+    function renderOfficers(searchTerm='') {
+        let officers = getData(STORAGE_KEYS.officers);
+        if(searchTerm) officers = officers.filter(o => o.name.toLowerCase().includes(searchTerm) || o.rank.toLowerCase().includes(searchTerm));
+        const tbody = document.getElementById('officers-tbody');
+        tbody.innerHTML = officers.map(o => `
+            <tr>
+                <td>${o.id}</td><td>${o.name}</td><td>${o.rank}</td><td>${o.badgeNumber}</td>
+                <td><span class="badge ${o.status === 'Active' ? 'active' : 'closed'}">${o.status}</span></td>
+                <td><button class="action-btn edit-btn" data-section="officers" data-id="${o.id}">✏️</button><button class="action-btn delete-btn" data-section="officers" data-id="${o.id}">🗑️</button></td>
+            </tr>
+        `).join('');
+        attachTableActions();
+    }
+    function renderCases(searchTerm='') {
+        let cases = getData(STORAGE_KEYS.cases);
+        if(searchTerm) cases = cases.filter(c => c.id.toLowerCase().includes(searchTerm) || c.title.toLowerCase().includes(searchTerm));
+        document.getElementById('cases-tbody').innerHTML = cases.map(c => `<tr><td>${c.id}</td><td>${c.title}</td><td>${c.description}</td><td><span class="badge ${c.status === 'Open' ? 'open' : c.status === 'Closed' ? 'closed' : 'active'}">${c.status}</span></td><td>${c.date}</td><td><button class="action-btn edit-btn" data-section="cases" data-id="${c.id}">✏️</button><button class="action-btn delete-btn" data-section="cases" data-id="${c.id}">🗑️</button></td></tr>`).join('');
+        attachTableActions();
+    }
+    function renderCriminals(searchTerm='') {
+        let criminals = getData(STORAGE_KEYS.criminals);
+        if(searchTerm) criminals = criminals.filter(c => c.name.toLowerCase().includes(searchTerm) || c.crimeType.toLowerCase().includes(searchTerm));
+        document.getElementById('criminals-tbody').innerHTML = criminals.map(c => `<tr><td>${c.id}</td><td>${c.name}</td><td>${c.crimeType}</td><td><span class="badge ${c.status === 'Incarcerated' ? 'active' : 'closed'}">${c.status}</span></td><td>${c.riskLevel}</td><td><button class="action-btn edit-btn" data-section="criminals" data-id="${c.id}">✏️</button><button class="action-btn delete-btn" data-section="criminals" data-id="${c.id}">🗑️</button></td></tr>`).join('');
+        attachTableActions();
+    }
+    function renderArrests(searchTerm='') {
+        let arrests = getData(STORAGE_KEYS.arrests);
+        if(searchTerm) arrests = arrests.filter(a => a.id.toLowerCase().includes(searchTerm) || a.criminalName.toLowerCase().includes(searchTerm));
+        document.getElementById('arrests-tbody').innerHTML = arrests.map(a => `<tr><td>${a.id}</td><td>${a.criminalName}</td><td>${a.caseId}</td><td>${a.arrestDate}</td><td>${a.location}</td><td><button class="action-btn edit-btn" data-section="arrests" data-id="${a.id}">✏️</button><button class="action-btn delete-btn" data-section="arrests" data-id="${a.id}">🗑️</button></td></tr>`).join('');
+        attachTableActions();
+    }
+
+    function attachTableActions() {
+        document.querySelectorAll('.edit-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const section = btn.dataset.section;
+                const id = btn.dataset.id;
+                openEditModal(section, id);
+            });
+        });
+        document.querySelectorAll('.delete-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                if(confirm('Delete record permanently?')) {
+                    const section = btn.dataset.section;
+                    const id = btn.dataset.id;
+                    deleteRecord(section, id);
+                }
+            });
+        });
+    }
+
+    function deleteRecord(section, id) {
+        let data = getData(STORAGE_KEYS[section]);
+        const newData = data.filter(item => item.id !== id);
+        saveData(STORAGE_KEYS[section], newData);
+        refreshAllSections();
+    }
+
+    function openEditModal(section, id) {
+        let data = getData(STORAGE_KEYS[section]);
+        const record = data.find(r => r.id === id);
+        if(!record) return;
+        activeModalSection = section;
+        currentEditContext = { section, id, record };
+        showModal(`Edit ${section.slice(0,-1)}`, section, record);
+    }
+
+    function showModal(title, section, existingData = null) {
+        document.getElementById('modalTitle').innerText = title;
+        const fieldsDiv = document.getElementById('modalFields');
+        let html = '';
+        if(section === 'officers') {
+            html = `<label>Full Name</label><input id="modal_name" value="${existingData?.name || ''}" required><label>Rank</label><input id="modal_rank" value="${existingData?.rank || ''}"><label>Badge Number</label><input id="modal_badge" value="${existingData?.badgeNumber || ''}"><label>Status</label><select id="modal_status"><option ${existingData?.status === 'Active' ? 'selected' : ''}>Active</option><option ${existingData?.status === 'On Leave' ? 'selected' : ''}>On Leave</option></select>`;
+        } else if(section === 'cases') {
+            html = `<label>FIR Title</label><input id="modal_title" value="${existingData?.title || ''}"><label>Description</label><input id="modal_desc" value="${existingData?.description || ''}"><label>Status</label><select id="modal_status"><option ${existingData?.status === 'Open' ? 'selected' : ''}>Open</option><option ${existingData?.status === 'Closed' ? 'selected' : ''}>Closed</option><option ${existingData?.status === 'Under Investigation' ? 'selected' : ''}>Under Investigation</option></select><label>Date</label><input id="modal_date" type="date" value="${existingData?.date || ''}">`;
+        } else if(section === 'criminals') {
+            html = `<label>Full Name</label><input id="modal_name" value="${existingData?.name || ''}"><label>Crime Type</label><input id="modal_crime" value="${existingData?.crimeType || ''}"><label>Status</label><select id="modal_status"><option ${existingData?.status === 'Incarcerated' ? 'selected' : ''}>Incarcerated</option><option ${existingData?.status === 'Wanted' ? 'selected' : ''}>Wanted</option><option ${existingData?.status === 'Parole' ? 'selected' : ''}>Parole</option></select><label>Risk Level</label><select id="modal_risk"><option ${existingData?.riskLevel === 'High' ? 'selected' : ''}>High</option><option ${existingData?.riskLevel === 'Medium' ? 'selected' : ''}>Medium</option><option ${existingData?.riskLevel === 'Low' ? 'selected' : ''}>Low</option><option ${existingData?.riskLevel === 'Critical' ? 'selected' : ''}>Critical</option></select>`;
+        } else if(section === 'arrests') {
+            const criminalsList = getData(STORAGE_KEYS.criminals);
+            const casesList = getData(STORAGE_KEYS.cases);
+            html = `<label>Criminal</label><select id="modal_criminalId"><option value="">Select Criminal</option>${criminalsList.map(c=>`<option value="${c.id}" ${existingData?.criminalId === c.id ? 'selected' : ''}>${c.name}</option>`)}</select><label>Case FIR ID</label><select id="modal_caseId"><option value="">Select FIR</option>${casesList.map(cs=>`<option value="${cs.id}" ${existingData?.caseId === cs.id ? 'selected' : ''}>${cs.id} - ${cs.title}</option>`)}</select><label>Arrest Date</label><input id="modal_date" type="date" value="${existingData?.arrestDate || ''}"><label>Location</label><input id="modal_location" value="${existingData?.location || ''}">`;
+        }
+        fieldsDiv.innerHTML = html;
+        document.getElementById('globalModal').classList.add('active');
+    }
+
+    function closeModal() { document.getElementById('globalModal').classList.remove('active'); currentEditContext = null; activeModalSection = ''; }
+
+    function saveModal() {
+        const section = activeModalSection;
+        let data = getData(STORAGE_KEYS[section]);
+        if(section === 'officers') {
+            const name = document.getElementById('modal_name')?.value;
+            if(!name) { alert("Name required"); return; }
+            const newOfficer = { id: currentEditContext ? currentEditContext.record.id : genOfficerId(), name, rank: document.getElementById('modal_rank').value, badgeNumber: document.getElementById('modal_badge').value, status: document.getElementById('modal_status').value };
+            if(currentEditContext) { data = data.map(o => o.id === newOfficer.id ? newOfficer : o); }
+            else { data.push(newOfficer); }
+            saveData(STORAGE_KEYS.officers, data);
+        }
+        else if(section === 'cases') {
+            const title = document.getElementById('modal_title')?.value;
+            if(!title) return alert("Title needed");
+            const newCase = { id: currentEditContext ? currentEditContext.record.id : genCaseId(), title, description: document.getElementById('modal_desc').value, status: document.getElementById('modal_status').value, date: document.getElementById('modal_date').value || new Date().toISOString().slice(0,10) };
+            if(currentEditContext) data = data.map(c => c.id === newCase.id ? newCase : c); else data.push(newCase);
+            saveData(STORAGE_KEYS.cases, data);
+        }
+        else if(section === 'criminals') {
+            const name = document.getElementById('modal_name')?.value;
+            if(!name) return alert("Name required");
+            const newCrim = { id: currentEditContext ? currentEditContext.record.id : genCriminalId(), name, crimeType: document.getElementById('modal_crime').value, status: document.getElementById('modal_status').value, riskLevel: document.getElementById('modal_risk').value };
+            if(currentEditContext) data = data.map(c => c.id === newCrim.id ? newCrim : c); else data.push(newCrim);
+            saveData(STORAGE_KEYS.criminals, data);
+        }
+        else if(section === 'arrests') {
+            const criminalId = document.getElementById('modal_criminalId')?.value;
+            const caseId = document.getElementById('modal_caseId')?.value;
+            if(!criminalId || !caseId) return alert("Select Criminal and Case FIR");
+            const criminals = getData(STORAGE_KEYS.criminals);
+            const criminal = criminals.find(c => c.id === criminalId);
+            const newArrest = { id: currentEditContext ? currentEditContext.record.id : genArrestId(), criminalId, criminalName: criminal.name, caseId, arrestDate: document.getElementById('modal_date').value, location: document.getElementById('modal_location').value };
+            if(currentEditContext) data = data.map(a => a.id === newArrest.id ? newArrest : a); else data.push(newArrest);
+            saveData(STORAGE_KEYS.arrests, data);
+        }
+        closeModal();
+        refreshAllSections();
+    }
+
+    function refreshAllSections() {
+        renderDashboard();
+        renderOfficers(document.getElementById('searchOfficers')?.value.toLowerCase() || '');
+        renderCases(document.getElementById('searchCases')?.value.toLowerCase() || '');
+        renderCriminals(document.getElementById('searchCriminals')?.value.toLowerCase() || '');
+        renderArrests(document.getElementById('searchArrests')?.value.toLowerCase() || '');
+    }
+
+    // Tab Switching
+    const tabs = document.querySelectorAll('.tab-btn');
+    const contents = document.querySelectorAll('.tab-content');
+    tabs.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const tabId = btn.dataset.tab;
+            contents.forEach(c => c.style.display = 'none');
+            document.getElementById(`${tabId}-section`).style.display = 'block';
+            tabs.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            refreshAllSections();
+        });
+    });
+
+    // Event Listeners for add btns
+    document.getElementById('addOfficerBtn')?.addEventListener('click', () => { activeModalSection = 'officers'; currentEditContext = null; showModal('Add New Police Officer', 'officers', null); });
+    document.getElementById('addCaseBtn')?.addEventListener('click', () => { activeModalSection = 'cases'; currentEditContext = null; showModal('Register New FIR', 'cases', null); });
+    document.getElementById('addCriminalBtn')?.addEventListener('click', () => { activeModalSection = 'criminals'; currentEditContext = null; showModal('Add Criminal Record', 'criminals', null); });
+    document.getElementById('addArrestBtn')?.addEventListener('click', () => { activeModalSection = 'arrests'; currentEditContext = null; showModal('Register Arrest', 'arrests', null); });
+    document.getElementById('modalCancel')?.addEventListener('click', closeModal);
+    document.getElementById('modalSave')?.addEventListener('click', saveModal);
+    document.getElementById('resetDataBtn')?.addEventListener('click', () => {
+        if(confirm("Reset all data to sample records?")) { localStorage.clear(); loadSampleData(); refreshAllSections(); alert("Data reset to Indian Police sample records!"); }
+    });
+    document.getElementById('searchOfficers')?.addEventListener('input', e=>renderOfficers(e.target.value.toLowerCase()));
+    document.getElementById('searchCases')?.addEventListener('input', e=>renderCases(e.target.value.toLowerCase()));
+    document.getElementById('searchCriminals')?.addEventListener('input', e=>renderCriminals(e.target.value.toLowerCase()));
+    document.getElementById('searchArrests')?.addEventListener('input', e=>renderArrests(e.target.value.toLowerCase()));
+    refreshAllSections();
+</script>
+</body>
+</html>
